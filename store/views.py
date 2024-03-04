@@ -1,15 +1,25 @@
 from django.shortcuts import render,redirect
-from store.models import Product
+from store.models import Product,BasketItem,Size
 
 # Create your views here.
 from django.views.generic import View,TemplateView
 from store.forms import RegistrationForm,LoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
+from django.contrib.auth import decorators
 
 # localhost:8000/register/
 # method=get,post
-# form class=RegistrationForm
+# form class=RegistrationFormcv
+
+def signin_required(fn):
+    
+    def wrapper(request,*args,**kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request,"Invalid Session!")
+        else:
+            return fn(request,*args,**kwargs)
+    return wrapper
 
 class SignUpView(View):
 
@@ -61,4 +71,51 @@ class ProductDetailView(View):
 class HomeView(TemplateView):
     template_name="base.html"
 
+
+class AddToBasketView(View):
+    def post(self,request,*args,**kwargs):
+        size=request.POST.get("size")
+        size_obj=Size.objects.get(name=size)
+        qty=request.POST.get("qty")
+        id=kwargs.get("pk")
+        product_obj=Product.objects.get(id=id)
+        BasketItem.objects.create(
+            size_object=size_obj,
+            qty=qty,
+            product_object=product_obj,
+            basket_object=request.user.cart
+        )
+        return redirect("index")
+    
+# listing all basketpdcts
+
+class BasketItemListView(View):
+    def get(self,request,*args,**kwargs):
+        qs=request.user.cart.cartitem.filter(is_order_placed=False)
+        return render(request,"cart_list.html",{"data":qs})
+    
+# basket item remove
+# localhost:8000/baskets/items/{id}/remove
+    
+
+class BasketItemRemoveView(View):
+    def get(self,request,*args,**kwargs):
+        id=kwargs.get("pk")
+        basket_item_object=BasketItem.objects.get(id=id)
+        basket_item_object.delete()
+        return redirect("basket-items")
+    
+class CartItemUpdateQuantityView(View):
+    
+    def post(self,request,*args,**kwargs):
+        action=request.POST.get("counterButton")
+        print(action)
+        id=kwargs.get("pk")
+        basket_item_object=BasketItem.objects.get(id=id)
+        if action=="+":
+            basket_item_object.qty+=1
+        else:
+            basket_item_object.qty-=1
+        basket_item_object.save()
+        return redirect("basket-items")
             
