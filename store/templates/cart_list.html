@@ -21,41 +21,27 @@
             <div>
               <p>Boy’s T-Shirt</p>
               <span>Price: {{bi.product_object.price}}</span> <br />
-              <p>Size:{{bi.size_object}}</p>
+              <p>Size: {{bi.size_object}}</p>
               <a href="{%url 'basketitem-remove' bi.id%}">remove</a>
             </div>
           </div>
         </td>
         <td>
-          <!-- test -->
           <div class="mb-2 flex">
-            <div class="min-w-24 flex">
-              <form action="{%url 'editcart-qty' bi.id%}" method="post">
-                {%csrf_token%}
-                {%if bi.qty > 1%}
-                <button type="submit" class="py-2 btn btn-dark" name="counterButton" value="-">
-                  -
-                </button>
-                {%endif%}
-                <input
-                  type="text"
-                  class="mx-1 h-7 w-9 rounded-md border text-center"
-                  value="{{bi.qty}}"
-                  name="qty"
-                  disabled
-                />
-                <button
-                  type="submit"
-                  class="py-2 btn btn-dark"
-                  name="counterButton"
-                  value="+"
-                >
-                  +
-                </button>
-              </form>
-            </div>
-        </td>
-        <td>{{bi.item_total}}</td>
+              <div class="min-w-24 flex">
+                  <form action="{% url 'editcart-qty' bi.id %}" method="post">
+                      {% csrf_token %}
+                      {% if bi.qty > 1 %}
+                          <button type="submit" class="py-2 btn btn-dark" name="counterButton" value="-">-</button>
+                      {% endif %}
+                      <input type="text" class="mx-1 h-7 w-9 rounded-md border text-center" value="{{ bi.qty }}" name="qty" disabled />
+                      <button type="submit" class="py-2 btn btn-dark" name="counterButton" value="+">+</button>
+                  </form>
+              </div>
+          </div>
+      </td>
+      
+      <td>{{bi.item_total}}</td>
       </tr>
        {%endfor%}
    
@@ -70,8 +56,8 @@
         </tr>
         
       </table>
-      <a href="#" class="checkout btn">Proceed To Checkout</a>
+      <a href="{%url 'checkout'%}" class="checkout btn">Proceed To Checkout</a>
     </div>
   </div>
 
-{%endblock%}
+{%endblock%}python 
