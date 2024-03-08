@@ -146,8 +146,8 @@ class CheckOutView(View):
                 order_object=order_obj,
                 basket_item_object=bi
             )
-            bi.is_order_placed=True
-            bi.save()
+                bi.is_order_placed=True
+                bi.save()
             
 
              # print(email,phone,address)
@@ -172,4 +172,10 @@ class OrderSummaryView(View):
     def get(self,request,*args,**kwargs):
         qs=Order.objects.filter(user_object=request.user)
         return render(request,"order_summary.html",{"data":qs})
-            
+    
+
+class OrderItemRemoveView(View):
+    def get(self,request,*args,**kwargs):
+        id=kwargs.get("pk")
+        OrderItems.objects.get(id=id).delete()
+        return redirect("order-summary")           
